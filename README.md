@@ -1,5 +1,5 @@
 # rudder-demonstration-code
-Code for demonstration example-task in RUDDER blog
+Code for demonstration example-task in RUDDER blog. For more materials see the [RUDDER repo](https://github.com/ml-jku/rudder) or the [practical step-by-step guide to applying RUDDER in PyTorch](https://github.com/widmi/rudder-a-practical-tutorial).
 
 ## A simple RUDDER demo:
 
