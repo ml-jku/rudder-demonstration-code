@@ -7,6 +7,7 @@ import torch
 from Environment import WatchRepairEnvironment, TabularActor
 from rudder import LessonBuffer
 from rudder import RRLSTM as LSTM
+import tqdm
 
 parser = argparse.ArgumentParser(description='Rudder Demonstration')
 
@@ -57,9 +58,10 @@ all_suboptimal_actions = []
 episode = 0
 
 print("Starting training using update rule: \"{}\"".format(update_rule) + "\n")
-print("------------------------------------------------")
-print("Episode |    # poor | brand/ | % good decisions ")
-print("        | decisions | action |      goal: > 90% ")
+print("---------------------------------------------------------------")
+print("Episode |    # poor | brand/ | % good decisions | runtime stats")
+print("        | decisions | action |      goal: > 90% |              ")
+pbar = tqdm.tqdm(desc="        |           |      n |                  | ", ncols=0)
 
 while len(env.optimal_actions_list) < avg_window or np.mean(env.optimal_actions_list) < 0.95:
     episode += 1
@@ -91,14 +93,19 @@ while len(env.optimal_actions_list) < avg_window or np.mean(env.optimal_actions_
                                                               actions=np.expand_dims(actions, 0))[0, :]
             # Train the policy, with the chosen learning method.
             improve_policy(eps_agent, states, actions, rewards)
-            print(f"{episode:7} | {episode - env.optimal_choices:9} |"
-                  f"    {states[0, -2]}/{actions[0]} |           {np.mean(env.optimal_actions_list):0.4}", end='\r')
+            
+            # Update the progressbar
+            desc = f"{episode:7} | {episode - env.optimal_choices:9} |    {states[0, -2]}/{actions[0]} |" \
+                   f"           {np.mean(env.optimal_actions_list):0.4f} |"
+            pbar.set_description(desc)
+            pbar.update(1)
+            pbar.refresh()
+            
             # Track performance for final plots.
             all_suboptimal_actions.append(episode - env.optimal_choices)
 
-print(f"{episode:7} | {episode - env.optimal_choices:9} |"
-      f"    {states[0, -2]}/{actions[0]} |           {np.mean(env.optimal_actions_list):0.4}")
-print(f"Done! (runtime: {time.time() - start_time})")
+print()
+print(f"Done! (runtime: {time.time() - start_time}")
 
 # Plot results
 fig, ax = plt.subplots()
