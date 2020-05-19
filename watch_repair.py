@@ -96,7 +96,9 @@ while len(env.optimal_actions_list) < avg_window or np.mean(env.optimal_actions_
             # Track performance for final plots.
             all_suboptimal_actions.append(episode - env.optimal_choices)
 
-print(f"Done! (runtime: {time.time() - start_time}")
+print(f"{episode:7} | {episode - env.optimal_choices:9} |"
+      f"    {states[0, -2]}/{actions[0]} |           {np.mean(env.optimal_actions_list):0.4}")
+print(f"Done! (runtime: {time.time() - start_time})")
 
 # Plot results
 fig, ax = plt.subplots()

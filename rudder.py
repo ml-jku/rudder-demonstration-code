@@ -58,9 +58,10 @@ class RRLSTM(nn.Module):
     def redistribute_reward(self, states, actions):
         # Prepare LSTM inputs
         states_var = Variable(torch.FloatTensor(states)).detach()
+        delta_states = torch.cat([states_var[:, 0:1, :], states_var[:, 1:, :] - states_var[:, :-1, :]], dim=1)
         actions_var = Variable(torch.FloatTensor(actions)).detach()
         # Calculate LSTM predictions
-        lstm_out = self.forward([states_var, actions_var])
+        lstm_out = self.forward([delta_states, actions_var])
         pred_g0 = torch.cat([torch.zeros_like(lstm_out[:, 0:1, :]), lstm_out], dim=1)[:, :-1, :]
 
         # Difference of predictions of two consecutive timesteps.
